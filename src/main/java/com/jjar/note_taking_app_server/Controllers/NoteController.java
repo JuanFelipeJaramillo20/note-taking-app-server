@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/notes")
-@CrossOrigin
+@CrossOrigin()
 public class NoteController {
 
     @Autowired
