@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
-    List<Note> findByUserIdAndArchivedFalse(User user);
-
-    List<Note> findByUserIdAndArchivedTrue(User user);
+    List<Note> findByUserAndArchived(User user, boolean archived);
+    List<Note> findByUserAndCategories_Name(User user, String categoryName);
 }

@@ -3,6 +3,7 @@ package com.jjar.note_taking_app_server.Services;
 import com.jjar.note_taking_app_server.Entities.Note;
 import com.jjar.note_taking_app_server.Entities.User;
 import com.jjar.note_taking_app_server.Repositories.NoteRepository;
+import com.jjar.note_taking_app_server.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,9 @@ public class NoteService {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public void archiveNoteById(Long id) {
         Note note = noteRepository.findById(id).orElseThrow(() -> new RuntimeException("Note not found"));
         note.setArchived(true);
@@ -30,14 +34,30 @@ public class NoteService {
         noteRepository.save(note);
     }
 
-    public List<Note> getActiveNotesForAuthenticatedUser() {
-        User authenticatedUser = authService.getAuthenticatedUser();
-        return noteRepository.findByUserIdAndArchivedFalse(authenticatedUser);
+    public Note createNoteForUser(Note note, String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        user.ifPresent(note::setUser);
+        return noteRepository.save(note);
     }
 
-    public List<Note> getArchivedNotesForAuthenticatedUser() {
-        User authenticatedUser = authService.getAuthenticatedUser();
-        return noteRepository.findByUserIdAndArchivedTrue(authenticatedUser);
+    public List<Note> getActiveNotesForUser(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if(user.isPresent()) {
+            return noteRepository.findByUserAndArchived(user.get(), false);
+        }
+        else{
+            return List.of();
+        }
+    }
+
+    public List<Note> getArchivedNotesForUser(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if(user.isPresent()) {
+            return noteRepository.findByUserAndArchived(user.get(), true);
+        }
+        else{
+            return List.of();
+        }
     }
 
     public List<Note> getAllNotes() {
