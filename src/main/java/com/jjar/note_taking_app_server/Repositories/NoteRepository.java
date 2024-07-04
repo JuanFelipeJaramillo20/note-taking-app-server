@@ -10,4 +10,5 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
     List<Note> findByUserAndArchived(User user, boolean archived);
     List<Note> findByUserAndCategories_Name(User user, String categoryName);
+    List<Note> findByUserId(Long id);
 }
